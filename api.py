@@ -12,7 +12,7 @@ def provision_vm(selected_server):
     config = get_config_values()[server_name]
     ipaddress = config["ipaddress"]
     username = config["username"]
-    pwd = input("Insert host {} passsword \n".format(ipaddress))
+    pwd = input("Insert host {} passsword: \n".format(ipaddress))
     p = paramiko.SSHClient()
     p.set_missing_host_key_policy(paramiko.AutoAddPolicy())   # This script doesn't work for me unless this line is added!
     print("Connecting to host {}, with username {} and password {}".format(ipaddress, username, pwd))
