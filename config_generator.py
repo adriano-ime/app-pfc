@@ -8,12 +8,12 @@ conf_file = configparser.ConfigParser()
 # INICIO_DA_PARTE_MANUAL
 conf_file["ServerOne"] = {
     "IPAddress": "172.16.31.220",
-    "Username": "pfc_navarro_adriano"
+    "Username": "pfc_navarro_adriano",
 }
 
 conf_file["ServerTwo"] = {
     "IPAddress": "172.16.31.192",
-    "Username": "pfc_navarro_adriano"
+    "Username": "pfc_navarro_adriano",
 }
 # FIM_DA_PARTE_MANUAL
 

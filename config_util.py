@@ -1,3 +1,5 @@
+import configparser
+
 def save_config(conf_file):
     with open(r"configurations.ini", 'w') as configfileObj:
         print("Updating configuration.ini file...")
@@ -13,3 +15,8 @@ def display_config_content():
     print(content)
     read_file.flush()
     read_file.close()
+
+def get_config_values():
+    config = configparser.ConfigParser()
+    config.read('configurations.ini')
+    return config
