@@ -1,8 +1,8 @@
 # This file mocks the provisioning of VM from the MicroStack machines
 import paramiko
-from enum import Enum
 from config_util import get_config_values
 from util import get_server_enum
+import os
 
 VM_PORT = 22
 
@@ -24,4 +24,13 @@ def provision_vm(selected_server):
     print("Virtual Machine successfully reserved")
     return opt
 
-print(provision_vm(1))
+def open_vm(selected_server):
+    server_name = get_server_enum(selected_server)
+    config = get_config_values()[server_name]
+    ipaddress = config["ipaddress"]
+    username = config["username"]
+    command = "ssh {}@{} 'ls -l'".format(username, ipaddress)
+    os.system("""osascript -e 'tell application "Terminal" to do script "{}"'""".format(command))
+
+
+open_vm(1)
