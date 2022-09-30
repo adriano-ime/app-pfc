@@ -1,22 +1,60 @@
-from _tkinter import ttk
+import tkinter as tk
 
-USER_TYPES = [
-    "admin",
-    "user"
-]
+from provision_screen import ProvisionScreen
 
-master = ttk.Tk()
+class AppSelectorScreen():
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Prova de Conceito - Provisionamento Multi-Cloud")
+        paddings = {'padx': 5, 'pady': 5}
 
-variable = ttk.StringVar(master)
-variable.set(USER_TYPES[0]) # default value
+        self.user_action_dict = {'Usuário': ['Provisionar'],
+                     'Administrador': ['Provisionar', 'Gerenciar']}
+        self.region_list = ['Região 1', 'Região 2']
 
-w = ttk.OptionMenu(master, variable, *USER_TYPES)
-w.pack()
+        self.user = tk.StringVar(self.master)
+        self.action = tk.StringVar(self.master)
+        self.region = tk.StringVar(self.master)
 
-def ok():
-    print ("value is:" + variable.get())
+        self.user.set('Usuário')
+        self.user.trace('w', self.update_options)
+        self.region.set('Região 1')
 
-button = ttk.Button(master, text="OK", command=ok)
-button.pack()
+        # User Option Menu Widget
+        user_label = tk.Label(self.master, text="Selecione o tipo de usuário que deseja acessar o sistema:")
+        user_label.grid(column=0, row=0, sticky=tk.W, **paddings)
+        self.user_option_menu = tk.OptionMenu(self.master, self.user, *self.user_action_dict.keys())
+        self.user_option_menu.grid(column=1, row=0, sticky=tk.W, **paddings)
 
-ttk.mainloop()
+        # Action Option Menu Widget
+        action_label = tk.Label(self.master, text="Selecione a seção que deseja acessar no sistema: ")
+        action_label.grid(column=0, row=1, sticky=tk.W, **paddings)
+        self.action_option_menu = tk.OptionMenu(self.master, self.action, '')
+        self.action_option_menu.grid(column=1, row=1, sticky=tk.W, **paddings)
+
+        # Region Option Menu Widget
+        region_label = tk.Label(self.master, text="Selecione a região que deseja trabalhar:")
+        region_label.grid(column=0, row=2, sticky=tk.W, **paddings)
+        self.region_option_menu = tk.OptionMenu(self.master, self.region, *self.region_list)
+        self.region_option_menu.grid(column=1, row=2, sticky=tk.W, **paddings)
+
+        # Continue Button Widget
+        self.continue_button = tk.Button(self.master, text="Continuar", command=self.on_continue)
+        self.continue_button.grid(column=0, row=3, sticky=tk.W, **paddings)
+
+    def on_continue(self):
+        if (self.action.get() == "Provisionar"):
+            self.master.withdraw()
+            toplevel = tk.Toplevel(self.master)
+            toplevel.geometry("900x600")
+            app = ProvisionScreen(toplevel)
+
+    def update_options(self, *args):
+        actions = self.user_action_dict[self.user.get()]
+        self.action.set(actions[0])
+
+        menu = self.action_option_menu['menu']
+        menu.delete(0, 'end')
+
+        for action in actions:
+            menu.add_command(label=action, command=lambda selected_action=action: self.action.set(selected_action))
