@@ -18,6 +18,8 @@ class AppSelectorScreen():
 
         self.user.set('Usuário')
         self.user.trace('w', self.update_options)
+        actions = self.user_action_dict[self.user.get()]
+        self.action.set(actions[0])
         self.region.set('Região 1')
 
         # User Option Menu Widget
@@ -47,7 +49,7 @@ class AppSelectorScreen():
             self.master.withdraw()
             toplevel = tk.Toplevel(self.master)
             toplevel.geometry("900x600")
-            app = ProvisionScreen(toplevel)
+            app = ProvisionScreen(toplevel, self.region)
 
     def update_options(self, *args):
         actions = self.user_action_dict[self.user.get()]
