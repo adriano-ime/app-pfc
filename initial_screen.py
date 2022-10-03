@@ -1,4 +1,6 @@
+from re import S
 import tkinter as tk
+from mgt_action_selection import ManagementActionSelectorScreen
 
 from provision_screen import ProvisionScreen
 
@@ -45,12 +47,18 @@ class AppSelectorScreen():
         self.continue_button.grid(column=0, row=3, sticky=tk.W, **paddings)
 
     def on_continue(self):
+        selected_region = 1 if self.region.get() == "Região 1" else 2
         if (self.action.get() == "Provisionar"):
-            selected_region = 1 if self.region.get() == "Região 1" else 2
             self.master.withdraw()
             toplevel = tk.Toplevel(self.master)
             toplevel.geometry("900x600")
             app = ProvisionScreen(toplevel, selected_region)
+        else:
+            self.master.withdraw()
+            toplevel = tk.Toplevel(self.master)
+            toplevel.geometry("600x400")
+            app = ManagementActionSelectorScreen(toplevel, selected_region)
+
 
     def update_options(self, *args):
         actions = self.user_action_dict[self.user.get()]

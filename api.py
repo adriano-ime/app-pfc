@@ -3,7 +3,7 @@ from sqlite3 import connect
 import paramiko
 from config_util import get_config_values
 from parser import parse_microstack_table
-from objects import FlavorObject, ImageObject, NetworkObject, SecurityGroupObject, ServerObject
+from objects import FlavorObject, ImageObject, NetworkObject, SecurityGroupObject, ServerObject, UsageObject
 from util import get_server_enum
 import os
 
@@ -81,6 +81,14 @@ def get_multiple_output_tables(selected_server, command_list):
         opt_list.append(output)
     return opt_list
 
+def get_usage_objects(usage_table):
+    usage_list = parse_microstack_table(usage_table)
+    usage_object_list = []
+    for index in range(1, len(usage_list)):
+        usage_object = UsageObject(usage_list[index][0], usage_list[index][1], usage_list[index][2], usage_list[index][3], usage_list[index][4])
+        usage_object_list.append(usage_object)
+    return usage_object_list
+    
 #TODO: Turn all these methods into a single one
 def get_available_flavors(flavor_table):
     flavor_list = parse_microstack_table(flavor_table)

@@ -12,6 +12,7 @@ import time
 from provision_form_modal import ProvisionFormModal
 
 from util import get_server_access_command
+
 COLUMN_HEADING_DICT = {
     'server_name': 'Nome do Servidor',
     'server_status': 'Status do Servidor',
