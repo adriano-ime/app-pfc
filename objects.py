@@ -1,4 +1,4 @@
-class SeverObject():
+class ServerObject():
     def __init__(self, id, name, status, networks, image, flavor):
         self.id = id
         self.name = name

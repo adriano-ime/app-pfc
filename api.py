@@ -3,7 +3,7 @@ from sqlite3 import connect
 import paramiko
 from config_util import get_config_values
 from parser import parse_microstack_table
-from objects import FlavorObject, ImageObject, NetworkObject, SecurityGroupObject
+from objects import FlavorObject, ImageObject, NetworkObject, SecurityGroupObject, ServerObject
 from util import get_server_enum
 import os
 
@@ -23,14 +23,24 @@ def connect_to_host(selected_server):
     return p
 
 # Returns the result of the provisioning
-def provision_vm(selected_server):
+def provision_default_vm(selected_server):
     p = connect_to_host(selected_server)
     print("Reserving virtual machine ...")
     stdin, stdout, stderr = p.exec_command("microstack launch cirros -n test")
     opt = stdout.readlines()
     opt = "".join(opt)
     print("Virtual Machine successfully reserved")
-    return opt
+    return opt 
+
+def provision_vm(selected_server, name, flavor, image, network_id, sec_group_id):
+    p = connect_to_host(selected_server)
+    print("Reserving virtual machine ...")
+    command = "microstack.openstack server create " + name + " --flavor " +flavor + " --image " + image + " --nic net-id=" + network_id + " --security-group " + sec_group_id
+    stdin, stdout, stderr = p.exec_command(command)
+    opt = stdout.readlines()
+    opt = "".join(opt)
+    print("Virtual Machine successfully reserved")
+    return opt 
 
 def open_vm(selected_server):
     server_name = get_server_enum(selected_server)
@@ -92,3 +102,16 @@ def get_available_security_groups(security_group_table):
         security_group_object = SecurityGroupObject(security_group_list[index][0], security_group_list[index][1], security_group_list[index][2], security_group_list[index][3], security_group_list[index][4])
         security_group_object_list.append(security_group_object)
     return security_group_object_list
+
+def get_instantiated_servers(server_table):
+    server_list = parse_microstack_table(server_table)
+    print(server_list)
+    server_object_list = []
+    for index in range(1, len(server_list)):
+        server_object = ServerObject(server_list[index][0], server_list[index][1], server_list[index][2], server_list[index][3], server_list[index][4], server_list[index][5])
+        server_object_list.append(server_object)
+    return server_object_list
+
+# s = get_list_table(1, "microstack.openstack server list")
+# a = get_instantiated_servers(s)
+# print(a[0].networks)

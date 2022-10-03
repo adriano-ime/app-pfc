@@ -46,10 +46,11 @@ class AppSelectorScreen():
 
     def on_continue(self):
         if (self.action.get() == "Provisionar"):
+            selected_region = 1 if self.region.get() == "Região 1" else 2
             self.master.withdraw()
             toplevel = tk.Toplevel(self.master)
             toplevel.geometry("900x600")
-            app = ProvisionScreen(toplevel, self.region)
+            app = ProvisionScreen(toplevel, selected_region)
 
     def update_options(self, *args):
         actions = self.user_action_dict[self.user.get()]
