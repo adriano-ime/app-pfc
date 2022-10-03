@@ -4,7 +4,8 @@ from re import M
 import tkinter as tk
 from tkinter import ANCHOR, ttk
 from tkinter.tix import COLUMN
-from api import get_available_flavors, get_available_images, get_available_networks, get_available_security_groups, get_instantiated_servers, get_multiple_output_tables
+import tkinter.messagebox
+from api import delete_vm, get_available_flavors, get_available_images, get_available_networks, get_available_security_groups, get_instantiated_servers, get_list_table, get_multiple_output_tables
 
 from loading_screen import LoadingScreen
 import time
@@ -32,45 +33,33 @@ class ProvisionScreen():
         self.master.title("Tela de Provisionamento de VM")
         table_frame = tk.LabelFrame(self.master, text="Minhas Máquinas Virtuais")
         table_frame.place(relheight=0.5, width=900)
-        table_vm = ttk.Treeview(table_frame)
+        self.table_vm = ttk.Treeview(table_frame)
         vm_columns = ['server_name', 'server_status', 'server_image', 'server_flavor', 'networks']
-        table_vm['columns'] = vm_columns
-        table_vm["show"] = 'headings'
+        self.table_vm['columns'] = vm_columns
+        self.table_vm["show"] = 'headings'
 
         for column in vm_columns:
-            table_vm.heading(column, text=COLUMN_HEADING_DICT[column])
-            table_vm.column(column, width=125 if column == 'networks' else 40)
-        table_vm.place(height=600, width=900)
-        table_vm.bind("<<TreeviewSelect>>", self.select_element)
-
-        i = 0
-#         servs = """"
-#         +--------------------------------------+-------------+--------+------------------------------------+--------+----------+
-# | ID                                   | Name        | Status | Networks                           | Image  | Flavor   |
-# +--------------------------------------+-------------+--------+------------------------------------+--------+----------+
-# | 284234a3-5849-46ff-9385-19036dd8c384 | test1       | ACTIVE | test=192.168.222.71, 10.20.20.210  | cirros | m1.tiny  |
-# | c7815ab7-0485-4642-82b7-299f19f1bfa1 | name-server | ERROR  |                                    | cirros | m1.small |
-# | e66e2d11-549c-45bd-81a8-ef4bb1cdfdf2 | test        | ACTIVE | test=192.168.222.34, 10.20.20.20   | cirros | m1.tiny  |
-# | d6e88494-65b1-411e-bb45-24a4f49ceb63 | test        | ACTIVE | test=192.168.222.218, 10.20.20.105 | cirros | m1.tiny  |
-# +--------------------------------------+-------------+--------+------------------------------------+--------+----------+"""
-#         self.servs = get_instantiated_servers(servs)
-        for server in self.servers:
-            print(server.name)
-            # Purposely removing one server for Demonstration (no Login functionality)
-            if i != 2:
-                table_vm.insert(parent='',index='end',iid=i,text='', values=(server.name, server.status, server.image, server.flavor, server.networks if server.networks != "" else "ERROR"))
-            i+=1
+            self.table_vm.heading(column, text=COLUMN_HEADING_DICT[column])
+            self.table_vm.column(column, width=125 if column == 'networks' else 40)
+        self.table_vm.place(height=600, width=900)
+        self.table_vm.bind("<<TreeviewSelect>>", self.select_element)
+        self.mount_table()
 
         provision_vm_button = tk.Button(self.master, text="Provisionar nova máquina virtual", command=self.on_provision_vm)
         provision_vm_button.place(relx=0.0, rely=0.5)
+        refresh_table_btn = tk.Button(self.master, text="Atualizar Tabela", command=self.on_refresh_table)
+        refresh_table_btn.place(relx=0.0, rely=0.6)
 
     def select_element(self, event):
         tree = event.widget
-        self.selected_element = int(tree.selection()[0])
-        copy_access_command_btn = tk.Button(self.master, text="Obter Comando de Acesso", command=lambda: self.copy_command_to_clipboard())
-        copy_access_command_btn.place(rely=0.5, relx=0.30)
-        open_vm_btn = tk.Button(self.master, text="Abrir máquina virtual", command=self.on_open_vm)
-        open_vm_btn.place(rely=0.5, relx=0.55)
+        if(tree.selection()[0]):
+            self.selected_element = int(tree.selection()[0])
+            copy_access_command_btn = tk.Button(self.master, text="Obter Comando de Acesso", command=lambda: self.copy_command_to_clipboard())
+            copy_access_command_btn.place(rely=0.5, relx=0.30)
+            open_vm_btn = tk.Button(self.master, text="Abrir máquina virtual", command=self.on_open_vm)
+            open_vm_btn.place(rely=0.5, relx=0.55)
+            delete_vm_btn = tk.Button(self.master, text="Deletar Máquina Virtual", command=self.on_delete_vm)
+            delete_vm_btn.place(rely=0.5, relx=0.80)
 
     def on_provision_vm(self):
         toplevel = tk.Toplevel(self.master)
@@ -82,11 +71,36 @@ class ProvisionScreen():
         self.master.clipboard_clear()
         self.master.clipboard_append(access_command)
         self.master.update()
-        command_copied_text = tk.Label(self.master, text="Comando de acesso copiado. Aperte Ctrl + V para usá-lo")
-        command_copied_text.place(rely=0.6, relx=0.3)
+        tkinter.messagebox.showinfo("Informação", "Comando copiado. Use Ctrl (Cmd) + V para usá-lo")
     
     def on_open_vm(self):
         print("Opening VM")
+    
+    def on_delete_vm(self):
+        loading_screen = LoadingScreen(self.master)
+        delete_vm(self.selected_region ,self.servers[self.selected_element].id)
+        loading_screen.destroy()
+        tkinter.messagebox.showinfo("Informação", "Máquina deletada com sucesso. Atualize a tabela para refletir as mudanças")
+    
+    def mount_table(self):
+        self.table_vm.delete(*self.table_vm.get_children())
+        i = 0
+        for server in self.servers:
+            print(server.name)
+            # Purposely removing one server for Demonstration (no Login functionality)
+            if i != 2:
+                self.table_vm.insert(parent='',index='end',iid=i,text='', values=(server.name, server.status, server.image, server.flavor, server.networks if server.networks != "" else "ERROR"))
+            i+=1
+    
+    def on_refresh_table(self):
+        loading_screen = LoadingScreen(self.master)
+        self.load_servers()
+        self.mount_table()
+        loading_screen.destroy()
+
+    def load_servers(self):
+        server_list = get_list_table(self.selected_region, "microstack.openstack server list")
+        self.servers = get_instantiated_servers(server_list)
 
     def load_information(self):
         command_list = [

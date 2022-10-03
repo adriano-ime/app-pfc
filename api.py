@@ -23,10 +23,13 @@ def connect_to_host(selected_server):
     return p
 
 # Returns the result of the provisioning
-def provision_default_vm(selected_server):
+def provision_default_vm(selected_server, name_server):
+    name = name_server
+    if not name_server or name_server == "":
+        name = "test"
     p = connect_to_host(selected_server)
     print("Reserving virtual machine ...")
-    stdin, stdout, stderr = p.exec_command("microstack launch cirros -n test")
+    stdin, stdout, stderr = p.exec_command("microstack launch cirros -n " + name)
     opt = stdout.readlines()
     opt = "".join(opt)
     print("Virtual Machine successfully reserved")
@@ -37,6 +40,15 @@ def provision_vm(selected_server, name, flavor, image, network_id, sec_group_id)
     print("Reserving virtual machine ...")
     command = "microstack.openstack server create " + name + " --flavor " +flavor + " --image " + image + " --nic net-id=" + network_id + " --security-group " + sec_group_id
     stdin, stdout, stderr = p.exec_command(command)
+    opt = stdout.readlines()
+    opt = "".join(opt)
+    print("Virtual Machine successfully reserved")
+    return opt 
+
+def delete_vm(selected_server, vm_id):
+    p = connect_to_host(selected_server)
+    print("Deleting virtual machine ...")
+    stdin, stdout, stderr = p.exec_command("microstack.openstack server delete " + vm_id)
     opt = stdout.readlines()
     opt = "".join(opt)
     print("Virtual Machine successfully reserved")
@@ -61,7 +73,6 @@ def get_list_table(selected_server, command):
     return opt
 
 def get_multiple_output_tables(selected_server, command_list):
-    p = connect_to_host(selected_server)
     print("Gathering multiple information information ...")
     opt_list = []
     for command in command_list:

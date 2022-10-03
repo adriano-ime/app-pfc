@@ -1,5 +1,7 @@
 import tkinter as tk
 from api import provision_default_vm, provision_vm
+from loading_screen import LoadingScreen
+import tkinter.messagebox
 
 from server import Server
 
@@ -42,8 +44,9 @@ class ProvisionFormModal():
         tk.Button(self.master, text="Criar", command=self.provision_vm).grid(row=6, column=1)
 
     def provision_vm(self):
+        loading_screen = LoadingScreen(self.master)
         if (self.is_default.get() == 1):
-            result = provision_default_vm(self.region)
+            result = provision_default_vm(self.region, self.server_name)
         else:
             network_id = ""
             sec_group_id = ""
@@ -55,6 +58,8 @@ class ProvisionFormModal():
                     sec_group_id = sec_group.id
             result = provision_vm(self.region, self.server_name, self.flavor, self.image, network_id, sec_group_id)
         print(result)
+        tkinter.messagebox.showinfo("Informação", "Máquina virtual provisionada com sucesso. Atualize a tabela para refletir as mudanças")
+        loading_screen.destroy()
         tk.Label(self.master, text=result).grid(row=7)
         self.master.withdraw()
         print("VM provisioned")
