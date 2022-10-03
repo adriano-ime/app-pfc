@@ -1,4 +1,5 @@
 import tkinter as tk
+from provision_screen import ProvisionScreen
 
 from usage_summary_screen import UsageSummaryScreen
 
@@ -30,3 +31,7 @@ class ManagementActionSelectorScreen():
             toplevel = tk.Toplevel(self.master)
             toplevel.geometry("900x600")
             app = UsageSummaryScreen(toplevel, self.selected_region)
+        elif(self.selected_action.get() == "Gerenciamento de Máquinas Virtuais"):
+            toplevel = tk.Toplevel(self.master)
+            toplevel.geometry("900x600")
+            app = ProvisionScreen(toplevel, self.selected_region, "admin")

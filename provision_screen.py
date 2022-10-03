@@ -22,7 +22,8 @@ COLUMN_HEADING_DICT = {
 }
 
 class ProvisionScreen():
-    def __init__(self, master, selected_region):
+    def __init__(self, master, selected_region, flow):
+        self.flow = flow
         self.master = master
         self.selected_region = selected_region
         self.selected_element = 0
@@ -31,8 +32,10 @@ class ProvisionScreen():
         self.load_information()
         loading_screen.destroy()
         self.master.deiconify()
-        self.master.title("Tela de Provisionamento de VM")
-        table_frame = tk.LabelFrame(self.master, text="Minhas Máquinas Virtuais")
+        title = "Tela de Provisionamento de VM" if flow == "user" else "Gerenciamento de Máquinas Virtuais"
+        self.master.title(title)
+        table_frame_label = "Minhas Máquinas Virtuais" if flow == "user" else "Máquinas Virtuais do Servidor"
+        table_frame = tk.LabelFrame(self.master, text=table_frame_label)
         table_frame.place(relheight=0.5, width=900)
         self.table_vm = ttk.Treeview(table_frame)
         vm_columns = ['server_name', 'server_status', 'server_image', 'server_flavor', 'networks']
@@ -48,12 +51,15 @@ class ProvisionScreen():
 
         provision_vm_button = tk.Button(self.master, text="Provisionar nova máquina virtual", command=self.on_provision_vm)
         provision_vm_button.place(relx=0.0, rely=0.5)
+        if (self.flow == "admin"):
+            delete_vm_btn = tk.Button(self.master, text="Deletar Máquina Virtual", command=self.on_delete_vm)
+            delete_vm_btn.place(rely=0.5, relx=0.30)
         refresh_table_btn = tk.Button(self.master, text="Atualizar Tabela", command=self.on_refresh_table)
         refresh_table_btn.place(relx=0.0, rely=0.6)
 
     def select_element(self, event):
         tree = event.widget
-        if(tree.selection()[0]):
+        if(tree.selection()[0] and self.flow == "user"):
             self.selected_element = int(tree.selection()[0])
             copy_access_command_btn = tk.Button(self.master, text="Obter Comando de Acesso", command=lambda: self.copy_command_to_clipboard())
             copy_access_command_btn.place(rely=0.5, relx=0.30)
@@ -86,12 +92,18 @@ class ProvisionScreen():
     def mount_table(self):
         self.table_vm.delete(*self.table_vm.get_children())
         i = 0
-        for server in self.servers:
-            print(server.name)
-            # Purposely removing one server for Demonstration (no Login functionality)
-            if i != 2:
+        if (self.flow == "user"):
+            for server in self.servers:
+                print(server.name)
+                # Purposely removing one server for Demonstration (no Login functionality)
+                if i != 2:
+                    self.table_vm.insert(parent='',index='end',iid=i,text='', values=(server.name, server.status, server.image, server.flavor, server.networks if server.networks != "" else "ERROR"))
+                i+=1
+        else:
+            for server in self.servers:
+                print(server.name)
                 self.table_vm.insert(parent='',index='end',iid=i,text='', values=(server.name, server.status, server.image, server.flavor, server.networks if server.networks != "" else "ERROR"))
-            i+=1
+                i+=1            
     
     def on_refresh_table(self):
         loading_screen = LoadingScreen(self.master)
