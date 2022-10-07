@@ -24,13 +24,14 @@ class ProvisionFormModal():
         self.image = tk.StringVar(self.master)
         self.sec_group = tk.StringVar(self.master)
         self.is_default = tk.IntVar(self.master)
+        self.server_name = tk.StringVar(self.master)
         self.network.set(network_options[0])
         self.flavor.set(self.flavors[0])
         self.image.set(self.images[0])
         self.sec_group.set(sec_group_options[0])
 
         tk.Label(self.master, text="Nome do Servidor").grid(row=0, sticky=tk.W)
-        self.server_name = tk.Entry(self.master).grid(row = 0, column = 1)
+        tk.Entry(self.master, textvariable=self.server_name).grid(row = 0, column = 1)
         tk.Label(self.master, text="Tipo de servidor").grid(row=1, sticky=tk.W)
         tk.OptionMenu(self.master, self.flavor, *self.flavors).grid(row=1, column=1)
         tk.Label(self.master, text="Imagem").grid(row=2, sticky=tk.W)
@@ -46,7 +47,8 @@ class ProvisionFormModal():
     def provision_vm(self):
         loading_screen = LoadingScreen(self.master)
         if (self.is_default.get() == 1):
-            result = provision_default_vm(self.region, self.server_name)
+            result = ""
+            result = provision_default_vm(self.region, self.server_name.get())
         else:
             network_id = ""
             sec_group_id = ""
@@ -56,7 +58,7 @@ class ProvisionFormModal():
             for sec_group in self.sec_groups:
                 if self.sec_group == sec_group.name:
                     sec_group_id = sec_group.id
-            result = provision_vm(self.region, self.server_name, self.flavor, self.image, network_id, sec_group_id)
+            result = provision_vm(self.region, self.server_name.get(), self.flavor.get(), self.image.get(), network_id, sec_group_id)
         print(result)
         tkinter.messagebox.showinfo("Informação", "Máquina virtual provisionada com sucesso. Atualize a tabela para refletir as mudanças")
         loading_screen.destroy()

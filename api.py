@@ -59,7 +59,8 @@ def open_vm(selected_server):
     config = get_config_values()[server_name]
     ipaddress = config["ipaddress"]
     username = config["username"]
-    command = "ssh {}@{} 'ls -l'".format(username, ipaddress)
+    password = "se9@ime_"
+    command = "sshpass -p {} ssh {}@{}".format(password,username, ipaddress)
     os.system("""osascript -e 'tell application "Terminal" to do script "{}"'""".format(command))
 
 def get_list_table(selected_server, command):
@@ -88,7 +89,7 @@ def get_usage_objects(usage_table):
         usage_object = UsageObject(usage_list[index][0], usage_list[index][1], usage_list[index][2], usage_list[index][3], usage_list[index][4])
         usage_object_list.append(usage_object)
     return usage_object_list
-    
+
 #TODO: Turn all these methods into a single one
 def get_available_flavors(flavor_table):
     flavor_list = parse_microstack_table(flavor_table)

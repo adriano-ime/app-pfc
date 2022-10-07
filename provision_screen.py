@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ANCHOR, ttk
 from tkinter.tix import COLUMN
 import tkinter.messagebox
-from api import delete_vm, get_available_flavors, get_available_images, get_available_networks, get_available_security_groups, get_instantiated_servers, get_list_table, get_multiple_output_tables
+from api import delete_vm, get_available_flavors, get_available_images, get_available_networks, get_available_security_groups, get_instantiated_servers, get_list_table, get_multiple_output_tables, open_vm
 
 from loading_screen import LoadingScreen
 import time
@@ -89,7 +89,7 @@ class ProvisionScreen():
         tkinter.messagebox.showinfo("Informação", "Comando copiado. Use Ctrl (Cmd) + V para usá-lo")
     
     def on_open_vm(self):
-        print("Opening VM")
+        open_vm(self.selected_region)
     
     def on_delete_vm(self):
         loading_screen = LoadingScreen(self.master)
