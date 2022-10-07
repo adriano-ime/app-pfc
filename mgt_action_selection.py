@@ -1,5 +1,6 @@
 import tkinter as tk
 from provision_screen import ProvisionScreen
+from total_server_usage_screen import TotalServerUsageScreen
 
 from usage_summary_screen import UsageSummaryScreen
 
@@ -35,3 +36,7 @@ class ManagementActionSelectorScreen():
             toplevel = tk.Toplevel(self.master)
             toplevel.geometry("900x600")
             app = ProvisionScreen(toplevel, self.selected_region, "admin")
+        else:
+            toplevel = tk.Toplevel(self.master)
+            toplevel.geometry("900x600")
+            app = TotalServerUsageScreen(toplevel, self.selected_region)

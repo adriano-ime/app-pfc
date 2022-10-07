@@ -48,12 +48,11 @@ class AppSelectorScreen():
 
     def on_continue(self):
         selected_region = 1 if self.region.get() == "Região 1" else 2
-        flow = "user" if self.user.get() == "Usuário" else "admin"
         if (self.action.get() == "Provisionar"):
             self.master.withdraw()
             toplevel = tk.Toplevel(self.master)
             toplevel.geometry("900x600")
-            app = ProvisionScreen(toplevel, selected_region, flow)
+            app = ProvisionScreen(toplevel, selected_region, "user" if self.user.get() == "Usuário" else "admin_provision")
         else:
             self.master.withdraw()
             toplevel = tk.Toplevel(self.master)

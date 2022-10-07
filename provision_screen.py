@@ -49,24 +49,32 @@ class ProvisionScreen():
         self.table_vm.bind("<<TreeviewSelect>>", self.select_element)
         self.mount_table()
 
-        provision_vm_button = tk.Button(self.master, text="Provisionar nova máquina virtual", command=self.on_provision_vm)
-        provision_vm_button.place(relx=0.0, rely=0.5)
+        if (self.flow != "admin"):
+            provision_vm_button = tk.Button(self.master, text="Provisionar nova máquina virtual", command=self.on_provision_vm)
+            provision_vm_button.place(relx=0.0, rely=0.5)
         if (self.flow == "admin"):
-            delete_vm_btn = tk.Button(self.master, text="Deletar Máquina Virtual", command=self.on_delete_vm)
-            delete_vm_btn.place(rely=0.5, relx=0.30)
+            return_btn = tk.Button(self.master, text="Retornar", command=self.on_return)
+            return_btn.place(rely=0.7, relx=0.0)
         refresh_table_btn = tk.Button(self.master, text="Atualizar Tabela", command=self.on_refresh_table)
         refresh_table_btn.place(relx=0.0, rely=0.6)
 
+    def on_return(self):
+        self.master.destroy()
+
     def select_element(self, event):
         tree = event.widget
-        if(tree.selection()[0] and self.flow == "user"):
+        if(tree.selection()[0]):
             self.selected_element = int(tree.selection()[0])
-            copy_access_command_btn = tk.Button(self.master, text="Obter Comando de Acesso", command=lambda: self.copy_command_to_clipboard())
-            copy_access_command_btn.place(rely=0.5, relx=0.30)
-            open_vm_btn = tk.Button(self.master, text="Abrir máquina virtual", command=self.on_open_vm)
-            open_vm_btn.place(rely=0.5, relx=0.55)
-            delete_vm_btn = tk.Button(self.master, text="Deletar Máquina Virtual", command=self.on_delete_vm)
-            delete_vm_btn.place(rely=0.5, relx=0.80)
+            if (self.flow == "admin"):
+                delete_vm_btn = tk.Button(self.master, text="Deletar Máquina Virtual", command=self.on_delete_vm)
+                delete_vm_btn.place(rely=0.5, relx=0.0)
+            else:
+                copy_access_command_btn = tk.Button(self.master, text="Obter Comando de Acesso", command=lambda: self.copy_command_to_clipboard())
+                copy_access_command_btn.place(rely=0.5, relx=0.30)
+                open_vm_btn = tk.Button(self.master, text="Abrir máquina virtual", command=self.on_open_vm)
+                open_vm_btn.place(rely=0.5, relx=0.55)
+                delete_vm_btn = tk.Button(self.master, text="Deletar Máquina Virtual", command=self.on_delete_vm)
+                delete_vm_btn.place(rely=0.5, relx=0.80)
 
     def on_provision_vm(self):
         toplevel = tk.Toplevel(self.master)
